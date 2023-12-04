@@ -23,6 +23,7 @@ import System.IO
 import Data.ByteString.Char8                              ( ByteString )
 import qualified Data.ByteString                          as B
 import qualified Data.ByteString.Char8                    as B8
+import GHC.MVar (MVar(MVar))
 
 
 -- -----------------------------------------------------------------------------
@@ -55,9 +56,26 @@ count config = do
 
 list :: Handle -> Config -> IO ()
 list handle config = do
-  -- Implement list mode here!
-  -- Remember to use "hPutStrLn handle" to write your output.
-  undefined
+  -- create mvars
+  mvs <- mapM (const newEmptyMVar) numbers
+  -- create threads
+  forkThreads (cfgThreads config) (`work` mvs)
+  -- wait for all threads to finish
+  mapM_ takeMVar mvs
+  where
+    -- list of numbers to check
+    numbers = [cfgLower config .. cfgUpper config]
+    -- work function for each thread
+    work :: Int -> [MVar ()] -> IO ()
+    work index mvs = do
+      -- check if number passes m-test
+      let number = numbers !! index
+      if mtest (cfgModulus config) number
+        then do
+          hPrint handle number
+          putMVar (mvs !! index) ()
+        else do
+          putMVar (mvs !! index) ()
 
 
 -- -----------------------------------------------------------------------------
