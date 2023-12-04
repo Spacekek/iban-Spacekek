@@ -113,7 +113,8 @@ search config query = do
   -- wait for all threads to finish
   mapM_ takeMVar mvs
   -- check if any thread found the number
-  return $ elemIndex True (map (fst . takeMVar) mvs)
+  -- return $ elemIndex True (map (fst . takeMVar) mvs)
+  undefined
   where
     -- list of numbers to check
     numbers = [cfgLower config .. cfgUpper config]
