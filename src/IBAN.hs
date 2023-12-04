@@ -50,7 +50,7 @@ count config = do
   -- Implement count mode here!
   count <- newIORef 0
   -- increment counter using casIORef, lock the counter every time we want to increment it and unlock it after
-  
+
   forkThreads (cfgThreads config) (`work` count)
   -- wait for all threads to finish
   readIORef count
@@ -104,7 +104,34 @@ list handle config = do
 search :: Config -> ByteString -> IO (Maybe Int)
 search config query = do
   -- Implement search mode here!
-  undefined
+  -- given SHA1 hash and range in which to search, find the number that hashes to the given hash and passes the m-test
+
+  -- create mvars
+  mvs <- mapM (const newEmptyMVar) numbers
+  -- create threads
+  forkThreads (cfgThreads config) (`work` mvs)
+  -- wait for all threads to finish
+  mapM_ takeMVar mvs
+  -- check if any thread found the number
+  return $ elemIndex True (map (fst . takeMVar) mvs)
+  where
+    -- list of numbers to check
+    numbers = [cfgLower config .. cfgUpper config]
+    -- work function for each thread
+    work :: Int -> [MVar (Bool, Int)] -> IO ()
+    work index mvs = do
+      -- check if number passes m-test
+      let number = numbers !! index
+      if mtest (cfgModulus config) number
+        then do
+          -- check if number hashes to the given hash
+          if checkHash query (show number)
+            then do
+              putMVar (mvs !! index) (True, number)
+            else do
+              putMVar (mvs !! index) (False, number)
+        else do
+          putMVar (mvs !! index) (False, number)
 
 
 -- -----------------------------------------------------------------------------
