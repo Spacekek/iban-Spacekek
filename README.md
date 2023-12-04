@@ -2,8 +2,8 @@
 [![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-718a45dd9cf7e7f842a935f5ebbe5719a5e09af4491e668f4dbf3b35d5cca122.svg)](https://classroom.github.com/online_ide?assignment_repo_id=13121451&assignment_repo_type=AssignmentRepo)
 # INFOB3CC Assignment 1: IBAN-calculator
 
-Name:  **ENTER YOUR NAME HERE**<br>
-Student Number: **ENTER YOUR STUDENT NUMBER HERE**
+Name:  **Tsjerk Piter Walinga**<br>
+Student Number: **0962414**
 
 For more information on the practical see the course website:
 <https://ics.uu.nl/docs/vakken/b3cc/assessment.html>
