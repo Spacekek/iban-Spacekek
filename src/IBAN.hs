@@ -24,6 +24,7 @@ import Data.ByteString.Char8                              ( ByteString )
 import qualified Data.ByteString                          as B
 import qualified Data.ByteString.Char8                    as B8
 import GHC.MVar (MVar(MVar))
+import Foreign (new)
 
 
 -- -----------------------------------------------------------------------------
@@ -47,7 +48,25 @@ count :: Config -> IO Int
 count config = do
   -- count the number of ints that pass the m-test, shared counter
   -- Implement count mode here!
-  undefined
+  count <- newIORef 0
+  -- increment counter using casIORef, lock the counter every time we want to increment it and unlock it after
+  
+  forkThreads (cfgThreads config) (`work` count)
+  -- wait for all threads to finish
+  readIORef count
+  where
+    numbers = [cfgLower config .. cfgUpper config]
+    -- work function for each thread
+    work :: Int -> IORef Int -> IO ()
+    work index count = do
+      -- check if number passes m-test
+      let number = numbers !! index
+      if mtest (cfgModulus config) number
+        then do
+          -- increment counter
+          undefined
+        else do
+          return ()
 
 
 -- -----------------------------------------------------------------------------
